@@ -24,7 +24,6 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,6 +32,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.test.ui.theme.TestTheme
 
 class MainActivity : ComponentActivity() {
@@ -84,9 +86,10 @@ enum class AppDestinations(
 }
 @Composable
 fun SearchScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: SearchViewModel = viewModel()
 ) {
-    var message by remember { mutableStateOf("Search page") }
+    val message = viewModel.message.value
 
     Row(
         modifier = modifier
@@ -94,37 +97,74 @@ fun SearchScreen(
             .padding(10.dp),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
-
     ) {
 
-        Text(
-            text = message
-        )
+        Text(text = message)
 
         Spacer(modifier = Modifier.width(10.dp))
 
-        Button(
-            onClick = { message = "Searching..." }
-        ) {
+        Button(onClick = { viewModel.search() }) {
             Text("Search")
         }
     }
 }
-
+sealed class MainRoutes(val route: String) {
+    data object First : MainRoutes("sub1")
+    data object Second : MainRoutes("sub2")
+}
 @Composable
 fun MainScreen(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
 
-    var message by rememberSaveable { mutableStateOf("Welcome on main page") }
+    NavHost(
+        navController = navController,
+        startDestination = MainRoutes.First.route,
+        modifier = modifier
+    ) {
+        composable(MainRoutes.First.route) {
+            FirstSubScreen(
+                onNext = { navController.navigate(MainRoutes.Second.route) }
+            )
+        }
 
+        composable(MainRoutes.Second.route) {
+            SecondSubScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+    }
+}
+@Composable
+fun FirstSubScreen(onNext: () -> Unit) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = message)
+        Text("Це перший підекран")
 
-        Button(onClick = { message = "Button pressed on main page" }) {
-            Text("Press")
+        Button(onClick = onNext, modifier = Modifier.padding(top = 16.dp)) {
+            Text("Перейти на другий")
+        }
+    }
+}
+@Composable
+fun SecondSubScreen(onBack: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text("Другий підекран", modifier = Modifier.align(Alignment.CenterHorizontally))
+
+        Button(
+            onClick = onBack,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Назад")
         }
     }
 }
@@ -133,13 +173,14 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = viewModel()
 ) {
+    val status = viewModel.status.value
     Column(
         modifier = modifier.fillMaxSize().
         padding(20.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = viewModel.status,
+            text = status,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 

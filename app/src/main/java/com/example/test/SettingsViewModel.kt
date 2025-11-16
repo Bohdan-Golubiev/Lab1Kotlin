@@ -1,16 +1,15 @@
 package com.example.test
 
-import androidx.lifecycle.ViewModel
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
 
 class SettingsViewModel : ViewModel() {
 
-    var status by mutableStateOf("Settings not saved")
-        private set
+    private val _status = mutableStateOf("Settings not saved")
+    val status: State<String> = _status
 
     fun updateStatus() {
-        status = "Settings saved"
+        _status.value = "Settings saved"
     }
 }

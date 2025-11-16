@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.androidx.benchmark.traceprocessor)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
