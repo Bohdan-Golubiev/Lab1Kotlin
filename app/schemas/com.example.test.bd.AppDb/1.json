@@ -1,0 +1,103 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "67c52f9b593f5ddc1eb9ed27e7dbe4af",
+    "entities": [
+      {
+        "tableName": "customers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`customer_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `customer_name` TEXT NOT NULL, `phone_number` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "customer_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "customer_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phone",
+            "columnName": "phone_number",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "customer_id"
+          ]
+        }
+      },
+      {
+        "tableName": "products",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`product_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `product_title` TEXT NOT NULL, `price` REAL NOT NULL, `customer_id` INTEGER NOT NULL, FOREIGN KEY(`customer_id`) REFERENCES `customers`(`customer_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "product_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "product_title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "price",
+            "columnName": "price",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "customerId",
+            "columnName": "customer_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "product_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_products_customer_id",
+            "unique": false,
+            "columnNames": [
+              "customer_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_products_customer_id` ON `${TABLE_NAME}` (`customer_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "customers",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "customer_id"
+            ],
+            "referencedColumns": [
+              "customer_id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '67c52f9b593f5ddc1eb9ed27e7dbe4af')"
+    ]
+  }
+}

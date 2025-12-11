@@ -1,6 +1,7 @@
 [versions]
 agp = "8.13.0"
-kotlin = "2.0.21"
+gson = "2.13.2"
+kotlin = "2.2.21"
 coreKtx = "1.10.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -10,12 +11,18 @@ activityCompose = "1.8.0"
 composeBom = "2024.09.00"
 foundationLayout = "1.9.4"
 navigationCompose = "2.9.6"
+room = "2.8.4"
+ksp = "2.2.21-2.0.4"
 ui = "1.9.4"
 benchmarkTraceprocessor = "1.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -39,4 +46,6 @@ androidx-benchmark-traceprocessor = { group = "androidx.benchmark", name = "benc
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+androidx-room = { id = "androidx.room", version.ref = "room" }
 
