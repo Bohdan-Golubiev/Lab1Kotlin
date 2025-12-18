@@ -25,4 +25,7 @@ interface AppRepository {
     suspend fun updateProduct(product: Product)
 
     suspend fun populateTestData()
+
+    suspend fun fetchAndSaveDataFromApi(): Result<Unit>
+    suspend fun syncWithApi(): Result<String>
 }

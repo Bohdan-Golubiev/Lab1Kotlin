@@ -1,5 +1,7 @@
 package com.example.test.utils
 
+import com.example.test.dto.CustomerDto
+import com.example.test.dto.ProductDto
 import com.example.test.entity.CustomerEntity
 import com.example.test.entity.ProductEntity
 import com.example.test.model.Customer
@@ -29,4 +31,22 @@ fun Product.toEntity() = ProductEntity(
     title = this.title,
     price = this.price,
     customerId = this.customer.id
+)
+fun CustomerDto.toEntity() = CustomerEntity(
+    id = this.id.toLongOrNull() ?: 0,
+    name = this.name,
+    phone = this.phone
+)
+
+fun ProductDto.toEntity() = ProductEntity(
+    id = this.id.toLongOrNull() ?: 0,
+    title = this.title,
+    price = this.price,
+    customerId = this.customerId.toLongOrNull() ?: 0
+)
+
+fun CustomerDto.toDomain() = Customer(
+    id = this.id.toLongOrNull() ?: 0,
+    name = this.name,
+    phone = this.phone
 )

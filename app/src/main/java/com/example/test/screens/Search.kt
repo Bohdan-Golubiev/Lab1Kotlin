@@ -3,24 +3,18 @@ package com.example.test.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.test.model.Customer
-import com.example.test.model.CustomerList
-import com.example.test.model.Product
-import com.example.test.model.ProductList
+import com.example.test.model.*
 import com.example.test.viewmodel.SearchViewModel
 
 @Composable
@@ -29,51 +23,100 @@ fun SearchScreen(
     viewModel: SearchViewModel = viewModel()
 ) {
     val items = viewModel.items.value
-
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        Text(
-            text = viewModel.message.value,
-            fontSize = 14.sp,
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = if (viewModel.message.value.contains("Помилка")) {
+                    MaterialTheme.colorScheme.errorContainer
+                } else {
+                    MaterialTheme.colorScheme.primaryContainer
+                }
+            )
         ) {
-            Button(
-                onClick = { viewModel.search() },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("Завантажити БД")
-            }
+            Text(
+                text = viewModel.message.value,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(16.dp),
+                color = if (viewModel.message.value.contains("Помилка")) {
+                    MaterialTheme.colorScheme.onErrorContainer
+                } else {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                }
+            )
+        }
 
-            Button(
-                onClick = { viewModel.resetDatabase() },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("Перезаписати БД")
-            }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Завантаження даних",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
 
-            Button(
-                onClick = { viewModel.clearDatabase() },
-                modifier = Modifier.weight(1f)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text("Очистити БД")
+                Button(
+                    onClick = { viewModel.loadFromApi() },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Icon(
+                        Icons.Default.Refresh,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text("З API")
+                }
+                Button(
+                    onClick = { viewModel.clearDatabase() },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text("Очистити БД")
+                }
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val listState = rememberLazyListState()
+
         LazyColumn(
+            state = listState,
             modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(items = items, key = { it.id }) { item ->
+            items(
+                items = items,
+                key = { item ->
+                    when (item) {
+                        is Product -> "product_${item.id}"
+                        is Customer -> "customer_${item.id}"
+                        is ProductList -> "product_header"
+                        is CustomerList -> "customer_header"
+                        else -> item.hashCode()
+                    }
+                }
+            ) { item ->
                 when (item) {
                     is ProductList -> SectionHeader("Товари", item.productList.size)
 
@@ -81,21 +124,18 @@ fun SearchScreen(
                         product = item,
                         onIncrease = { viewModel.increasePriceBy100(item) },
                         onDecrease = { viewModel.decreasePriceBy100(item) },
-                        onDelete = { viewModel.deleteProduct(item) }
-                    )
+                        onDelete = { viewModel.deleteProduct(item) } )
 
                     is CustomerList -> SectionHeader("Клієнти", item.customerList.size)
 
                     is Customer -> CustomerCard(
                         customer = item,
-                        onDelete = { viewModel.deleteCustomer(item) }
-                    )
+                        onDelete = { viewModel.deleteCustomer(item) } )
                 }
             }
         }
     }
 }
-
 
 @Composable
 fun SectionHeader(title: String, count: Int) {
@@ -167,7 +207,7 @@ fun ProductCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Верхня частина - інформація про товар
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
